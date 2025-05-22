@@ -89,17 +89,5 @@ if st.session_state.raw_response_lines:
             copied_text += f"{cat}\n" + "\n".join(selected) + "\n\n"
 
     if copied_text:
-        st.text_area("📋 Copied Tasks", value=copied_text.strip(), height=200, key="copied_area")
-        components.html(f"""
-            <script>
-            function copyToClipboard() {{
-                const textArea = window.parent.document.querySelector('textarea[data-testid="stTextArea"]');
-                if (textArea) {{
-                    textArea.select();
-                    document.execCommand('copy');
-                    alert('✅ Tasks copied to clipboard!');
-                }}
-            }}
-            </script>
-            <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-        """, height=50)
+        st.markdown("## 📋 Copied Tasks")
+        st.text_area("", value=copied_text.strip(), height=200, key="copied_area")
