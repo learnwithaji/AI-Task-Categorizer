@@ -70,18 +70,20 @@ if st.session_state.raw_response_lines:
     current_category = ""
     category_to_tasks = {}
 
-    for line in st.session_state.raw_response_lines:
-        if line.startswith("--"):
-            current_category = line.strip()
-            st.markdown(f"**{current_category}**")
-            category_to_tasks[current_category] = []
-        elif line.strip().startswith("- "):
-            task_line = line.strip()[2:]
-            task_key = f"{current_category}::{task_line}"
-            checked = st.checkbox(task_line, key=task_key)
-            category_to_tasks[current_category].append((task_line, checked))
-        elif line.strip():
-            st.markdown(line.strip())
+for line in st.session_state.raw_response_lines:
+    if line.startswith("--"):
+        current_category = line.strip()
+        st.markdown(f"**{current_category}**")
+        category_to_tasks[current_category] = []
+    elif line.strip().startswith("- "):
+        if not current_category:
+            continue  # Skip tasks without a valid category
+        task_line = line.strip()[2:]
+        task_key = f"{current_category}::{task_line}"
+        checked = st.checkbox(task_line, key=task_key)
+        category_to_tasks[current_category].append((task_line, checked))
+    elif line.strip():
+        st.markdown(line.strip())
 
     for cat, tasks in category_to_tasks.items():
         selected = [f"- {t[0]}" for t in tasks if t[1]]
