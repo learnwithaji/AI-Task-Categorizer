@@ -64,6 +64,8 @@ if st.button("Categorize & Prioritize"):
             except Exception as e:
                 st.error(f"Something went wrong: {e}")
 
+copied_text = ""
+
 if st.session_state.raw_response_lines:
     current_category = ""
     category_to_tasks = {}
@@ -81,28 +83,23 @@ if st.session_state.raw_response_lines:
         elif line.strip():
             st.markdown(line.strip())
 
-    if st.button("Copy Selected Tasks"):
-        copied_text = ""
-        for cat, tasks in category_to_tasks.items():
-            selected = [f"- {t[0]}" for t in tasks if t[1]]
-            if selected:
-                copied_text += f"{cat}\n" + "\n".join(selected) + "\n\n"
+    for cat, tasks in category_to_tasks.items():
+        selected = [f"- {t[0]}" for t in tasks if t[1]]
+        if selected:
+            copied_text += f"{cat}\n" + "\n".join(selected) + "\n\n"
 
-        if copied_text:
-            st.text_area("📋 Copied Tasks (Read-only)", value=copied_text.strip(), height=200, key="copied_area")
-            components.html(f"""
-                <script>
-                function copyToClipboard() {{
-                    const text = `{copied_text.strip().replace("`", "'").replace("\n", "\\n")}`;
-                    navigator.clipboard.writeText(text).then(function() {{
-                        alert('✅ Tasks copied to clipboard!');
-                    }}, function(err) {{
-                        alert('❌ Failed to copy: ', err);
-                    }});
+    if copied_text:
+        st.text_area("📋 Copied Tasks", value=copied_text.strip(), height=200, key="copied_area")
+        components.html(f"""
+            <script>
+            function copyToClipboard() {{
+                const textArea = window.parent.document.querySelector('textarea[data-testid="stTextArea"]');
+                if (textArea) {{
+                    textArea.select();
+                    document.execCommand('copy');
+                    alert('✅ Tasks copied to clipboard!');
                 }}
-                </script>
-                <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-            """, height=50)
-        else:
-            st.warning("⚠️ No tasks selected to copy.")
-
+            }}
+            </script>
+            <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+        """, height=50)
