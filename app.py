@@ -27,8 +27,8 @@ Instructions:
 3. do not use the word priority in the output. just show the priority level
 
 Output format:
--- Category Name
-- Priority: Task
+- Category Name
+-- Priority: Task
 
 Tasks:
 {tasks}
