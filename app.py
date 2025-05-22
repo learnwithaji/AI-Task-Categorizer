@@ -90,20 +90,19 @@ if st.session_state.raw_response_lines:
 
         if copied_text:
             st.text_area("📋 Copied Tasks (Read-only)", value=copied_text.strip(), height=200, key="copied_area")
-        
-            # Inject JS to copy text from the textarea to clipboard
             components.html(f"""
                 <script>
                 function copyToClipboard() {{
-                    const textarea = window.parent.document.querySelector('textarea[key="copied_area"]');
-                    if (textarea) {{
-                        textarea.select();
-                        document.execCommand('copy');
-                        alert("✅ Tasks copied to clipboard!");
-                    }}
+                    const text = `{copied_text.strip().replace("`", "'").replace("\n", "\\n")}`;
+                    navigator.clipboard.writeText(text).then(function() {{
+                        alert('✅ Tasks copied to clipboard!');
+                    }}, function(err) {{
+                        alert('❌ Failed to copy: ', err);
+                    }});
                 }}
                 </script>
                 <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
             """, height=50)
         else:
             st.warning("⚠️ No tasks selected to copy.")
+
