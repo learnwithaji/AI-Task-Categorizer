@@ -5,6 +5,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import re
+import streamlit.components.v1 as components
+
 
 # Load API key from .env
 load_dotenv()
@@ -87,7 +89,21 @@ if st.session_state.raw_response_lines:
                 copied_text += f"{cat}\n" + "\n".join(selected) + "\n\n"
 
         if copied_text:
-            st.text_area("📋 Copied Tasks (Paste anywhere):", value=copied_text.strip(), height=200)
-            st.toast("Copied to clipboard! Paste manually from the box above.")
+            st.text_area("📋 Copied Tasks (Read-only)", value=copied_text.strip(), height=200, key="copied_area")
+        
+            # Inject JS to copy text from the textarea to clipboard
+            components.html(f"""
+                <script>
+                function copyToClipboard() {{
+                    const textarea = window.parent.document.querySelector('textarea[key="copied_area"]');
+                    if (textarea) {{
+                        textarea.select();
+                        document.execCommand('copy');
+                        alert("✅ Tasks copied to clipboard!");
+                    }}
+                }}
+                </script>
+                <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            """, height=50)
         else:
             st.warning("⚠️ No tasks selected to copy.")
